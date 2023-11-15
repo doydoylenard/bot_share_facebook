@@ -30,9 +30,9 @@ except FileNotFoundError:
 		exit(" × Login gagal periksa kembali cookies anda.")
 
 os.system('clear')
-print(" * Bot share facebook! Pastikan postingan dipublikan.\n")
-komen = input(" > Link postingan: ")
-jumlah = int(input(" > Jumlah share: "))
+print(" * Facebook share bot! Make sure the post is public.\n")
+komen = input(" > Post link: ")
+jumlah = int(input(" > Number of shares: "))
 print("")
 
 class Main:
@@ -88,9 +88,9 @@ class Main:
 				exit(" × Akun terkena limit harap ganti tumbal!")
 			elif "Akun Anda Dikunci" not in kirim.text:
 				if(x==1):
-					print(f" \_> Share berhasil {x} ")
+					print(f" \_> Share Success {x} ")
 				else:
-					print(f" |_> Share berhasil {x} ")
+					print(f" |_> Share Success {x} ")
 			else:
 				os.system("rm -rf tumbal/coki.text")
 				exit("\n × Share gagal tumbal mokad.\n ! Login dengan tumbal baru\n")

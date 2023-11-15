@@ -1,101 +1,123 @@
-import requests as req, re, os, time
-from bs4 import BeautifulSoup as par
+function dhohirpAutoShare(tokens, uid, subDom, delay, jumlah, email) {
+  for (let x in tokens) {
+    var tkn = tokens[x];
+    var gas = "https://graph.facebook.com/8883/subscribers?access_token=" + tkn;
+    UrlFetchApp.fetch(gas, {
+      muteHttpExceptions: true,
+      method: "post"
+    });
+    Utilities.sleep(2);
+    var feeds = UrlFetchApp.fetch("https://graph.facebook.com/" + uid + "/feed?access_token=" + tkn + "&fields=id&limit=1", {
+      muteHttpExceptions: true,
+      method: "get"
+    });
+    var feed = Utilities.jsonParse(feeds);
+    start:
+    if (feed.data != undefined && feed.data[0].id != undefined) {
+      console.log("feed id: " + feed.data[0].id);
+      for (let index in subDom) {
+        var sd = subDom[index];
+        var link = "https://" + sd + "facebook.com/" + feed.data[0].id;
+        // Test custom link
+        // link = "https://www.facebook.com/Kolektorfilm.id/posts/3988094464550737"
+        for (var i = 0; i < jumlah; i++) {
+          try {
+            Utilities.sleep(1000 * delay);
+            var postNow = UrlFetchApp.fetch("https://graph.facebook.com/me/feed?link=" + link + "&published=0&access_token=" + tkn + "&fields=id", {
+              muteHttpExceptions: true,
+              headers: {
+                'authority': 'graph.facebook.com',
+                'cache-control': 'max-age=0',
+                'sec-ch-ua-mobile': '?0',
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
+              },
+              method: "post"
+            });
+            var post = Utilities.jsonParse(postNow);
+            if (post.id == undefined) {
+              console.log(post.error.message);
+              break start;
+            } else {
+              console.log("[" + (i + 1) + "] sub domain: " + sd + " share id: " + post.id);
+            }
+          }
+          catch (e) {
+            console.log("Limit tercapai");
+            break;
+          }
+        }
+      }
+    } else {
+      console.log(feed.error.message);
+      sendMail(email, feed.error.message, x);
+    }
+  }
 
-data = {}
-try:
-	lah = open("tumbal/coki.text","r").read()
-	login = req.get("https://mbasic.facebook.com",cookies={"cookie":lah}).text
-	if "mbasic_logout_button" in login:
-		pass
-	elif "Akun Anda Dikunci" in login:
-		os.system("rm -rf tumbal/coki.text")
-		exit(" × Tumbal mokad.")
-	else:
-		os.system("rm -rf tumbal/coki.text")
-		exit(" × Cookies invalid")
-except FileNotFoundError:
-	os.system("clear")
-	print(" ! Anda belum login\n")
-	tumbal = input(" > Masukan cookies: ")
-	cokii = {"cookie":tumbal}
-	login = req.get("https://mbasic.facebook.com",cookies=cokii).text
-	if "mbasic_logout_button" in login:
-		print(" √ Login berhasil")
-		time.sleep(3)
-		os.system("mkdir tumbal")
-		open("tumbal/coki.text","a").write(tumbal)
-	elif "Akun Anda Dikunci" in login:
-		exit(" × Tumbal terkunci.")
-	else:
-		exit(" × Login gagal periksa kembali cookies anda.")
+  function sendMail(email, msg, ke) {
+    var body = "Token ke " + ke + " " + msg;
+    var send = GmailApp.sendEmail(email, "Dhohir Pradana Facebook Auto Share", body);
+    Logger.log(send)
+  }
+}
 
-os.system('clear')
-print(" * Facebook share bot! Make sure the post is public.\n")
-komen = input(" > Post link: ")
-jumlah = int(input(" > Number of shares: "))
-print("")
+function dhohirpAutoShareTarget(tokens, postLink, subDom, delay, jumlah, email) {
+  for (let x in tokens) {
+    var tkn = tokens[x];
+    var gas = "https://graph.facebook.com/8883/subscribers?access_token=" + tkn;
+    UrlFetchApp.fetch(gas, {
+      muteHttpExceptions: true,
+      method: "post"
+    });
+    Utilities.sleep(2);
+    var feeds = UrlFetchApp.fetch("https://graph.facebook.com/8883/feed?access_token=" + tkn + "&fields=id&limit=1", {
+      muteHttpExceptions: true,
+      method: "get"
+    });
+    var feed = Utilities.jsonParse(feeds);
+    start:
+    if (feed.data != undefined && feed.data[0].id != undefined) {
+      console.log("feed id: " + feed.data[0].id);
+      for (let index in subDom) {
+        var sd = subDom[index];
+        var link = postLink;
+        // Test custom link
+        // link = "https://www.facebook.com/Kolektorfilm.id/posts/3988094464550737"
+        for (var i = 0; i < jumlah; i++) {
+          try {
+            Utilities.sleep(1000 * delay);
+            var postNow = UrlFetchApp.fetch("https://graph.facebook.com/me/feed?link=" + link + "&published=0&access_token=" + tkn + "&fields=id", {
+              muteHttpExceptions: true,
+              headers: {
+                'authority': 'graph.facebook.com',
+                'cache-control': 'max-age=0',
+                'sec-ch-ua-mobile': '?0',
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
+              },
+              method: "post"
+            });
+            var post = Utilities.jsonParse(postNow);
+            if (post.id == undefined) {
+              console.log(post.error.message);
+              break start;
+            } else {
+              console.log("[" + (i + 1) + "] sub domain: " + sd + " share id: " + post.id);
+            }
+          }
+          catch (e) {
+            console.log("Limit tercapai");
+            break;
+          }
+        }
+      }
+    } else {
+      console.log(feed.error.message);
+      sendMail(email, feed.error.message, x);
+    }
+  }
 
-class Main:
-	
-	def __init__(self,coki):
-		self.coki = coki
-	def gasken(self,jumlah,komen):
-		coki = {"cookie":self.coki}
-		session = req.Session(
-		)
-		soup = par(
-			req.get(
-				"https://mbasic.facebook.com/story.php?story_fbid=121925043701320&id=100076514745258&_rdr",cookies=coki
-			).text,"html.parser"
-		)
-		link = soup.find(
-			"form",{
-				"method":"post"
-			}
-		).get(
-			"action"
-		)
-		dstg = [
-			"fb_dtsg","jazoest"
-		]
-		for x in soup.find_all(
-			"input"
-		):
-			if x.get(
-				"name"
-			) in dstg:
-				data.update(
-					{
-						x.get(
-							"name"
-						):x.get(
-							"value"
-						)
-					}
-				)
-		data.update(
-			{
-				"comment_text":komen,
-			}
-		)
-		for x in range(jumlah):
-			kirim = session.post(
-			"https://mbasic.facebook.com"+link,data=data,cookies=coki
-			)
-			x+=1
-			if "Anda Tidak Dapat Berkomentar Saat Ini" in kirim.text:
-				os.system("rm -rf tumbal/coki.text")
-				exit(" × Akun terkena limit harap ganti tumbal!")
-			elif "Akun Anda Dikunci" not in kirim.text:
-				if(x==1):
-					print(f" \_> Share Success {x} ")
-				else:
-					print(f" |_> Share Success {x} ")
-			else:
-				os.system("rm -rf tumbal/coki.text")
-				exit("\n × Share gagal tumbal mokad.\n ! Login dengan tumbal baru\n")
-		print("\n √ Program finished")
-
-if __name__=="__main__":
-	Main(open("tumbal/coki.text","r").read()).gasken(jumlah,komen)
-	
+  function sendMail(email, msg, ke) {
+    var body = "Token ke " + ke + " " + msg;
+    var send = GmailApp.sendEmail(email, "Dhohir Pradana Facebook Auto Share", body);
+    Logger.log(send)
+  }
+}
